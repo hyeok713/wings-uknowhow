@@ -36,7 +36,6 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     Conversation(getSampleData().conversationSample)
-//                    MessageCard(Message("Hyeok", "Jetpack Compose"))
                 }
             }
         }
@@ -100,7 +99,7 @@ fun MessageCard(msg: Message) {
         Column {
             Text(
                 modifier = Modifier.clickable {
-                   println(msg.author)
+                    println(msg.author)
                 },
                 text = msg.author,
                 color = MaterialTheme.colors.secondaryVariant,
@@ -140,6 +139,15 @@ fun Conversation(messages: List<Message>) {
             MessageCard(msg = message)
         }
     }
+//    Column {
+//        if (messages.isEmpty()) {
+//            Text("No Messages")
+//        } else {
+//            messages.forEach {
+//                MessageCard(msg = it)
+//            }
+//        }
+//    }
 }
 
 
