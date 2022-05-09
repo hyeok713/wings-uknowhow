@@ -1,9 +1,11 @@
 package com.wings.uknowhow
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -20,12 +23,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.wings.uknowhow.ui.theme.UknowhowTheme
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.test.withTestContext
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val viewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -35,7 +43,24 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Conversation(getSampleData().conversationSample)
+                    val sampleData = SampleData(
+                        arrayListOf<Message>(
+                            Message("Hyeok", "Hello guys"),
+                            Message("Hye", "Hello guys"),
+                            Message(
+                                "ok",
+                                "this is my first compose project.\nthis is my first compose project.\nthis is my first compose project.\n" +
+                                        "this is my first compose project.\n" +
+                                        "this is my first compose project.\n" +
+                                        "this is my first compose project.\n" +
+                                        "this is my first compose project."
+                            ),
+                            Message("eok", "guys"),
+                            Message("ffffk", "test"),
+                            Message("powerovjer", "hi")
+                        )
+                    )
+                    Conversation(sampleData.messages)
                 }
             }
         }
@@ -44,34 +69,7 @@ class MainActivity : ComponentActivity() {
 
 }
 
-data class SampleData(val conversationSample: List<Message>)
-
-fun getSampleData(): SampleData {
-    return SampleData(
-        arrayListOf<Message>(
-            Message("Hyeok", "Hello guys"),
-            Message("Hye", "Hello guys"),
-            Message(
-                "ok",
-                "this is my first compose project.\nthis is my first compose project.\nthis is my first compose project." +
-                        "\n" +
-                        "this is my first compose project.\n" +
-                        "this is my first compose project." +
-                        "\n" +
-                        "this is my first compose project.\n" +
-                        "this is my first compose project." +
-                        "\n" +
-                        "this is my first compose project.\n" +
-                        "this is my first compose project."
-            ),
-            Message("eok", "guys"),
-            Message("ffffk", "test"),
-            Message("powerovjer", "hi")
-        )
-    )
-}
-
-
+data class SampleData(val messages: List<Message>)
 data class Message(val author: String, val body: String)
 
 @Composable
@@ -134,20 +132,21 @@ fun MessageCard(msg: Message) {
 
 @Composable
 fun Conversation(messages: List<Message>) {
-    LazyColumn {
-        items(messages) { message ->
-            MessageCard(msg = message)
+    Column {
+        LazyColumn {
+            items(messages) {
+                MessageCard(msg = it)
+            }
+        }
+        val context = LocalContext.current
+        Button ( onClick = {
+            context.startActivity(Intent(context, InputActivity::class.java))
+        }) {
+            // Button Configurations
+            Text("Start Activity")
         }
     }
-//    Column {
-//        if (messages.isEmpty()) {
-//            Text("No Messages")
-//        } else {
-//            messages.forEach {
-//                MessageCard(msg = it)
-//            }
-//        }
-//    }
+    
 }
 
 
@@ -155,8 +154,6 @@ fun Conversation(messages: List<Message>) {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = false, name = "Dark Mode")
 @Composable
 fun DefaultPreview() {
-    data class SampleData(val conversationSample: List<Message>)
-
     val sampleData = SampleData(
         arrayListOf<Message>(
             Message("Hyeok", "Hello guys"),
@@ -177,6 +174,9 @@ fun DefaultPreview() {
 
     UknowhowTheme {
 //        MessageCard(Message("Hyeok's", "Jetpack Compose"))
-        Conversation(messages = sampleData.conversationSample)
+        Column {
+            Conversation(messages = sampleData.messages)
+        }
+        
     }
 }
